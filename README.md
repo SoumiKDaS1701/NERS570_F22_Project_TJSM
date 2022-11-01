@@ -1,1 +1,1 @@
-# NERS570_F22_Project_TJSM
+Data processing and conversion of NetCDF and OpenFOAM data types
