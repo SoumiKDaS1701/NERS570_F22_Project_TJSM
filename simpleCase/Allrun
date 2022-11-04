@@ -1,0 +1,30 @@
+#!/bin/sh
+cd "${0%/*}" || exit                                # Run from this directory
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
+#------------------------------------------------------------------------------
+
+# - meshing
+rm -rf 0
+echo "Generating mesh.."
+echo "########## run blockMesh ##########"
+runApplication blockMesh
+
+cp -rf 0.orig 0
+
+echo "########## run checkMesh ##########"
+runApplication checkMesh
+
+echo "########## run flow solver ##########"
+runApplication potentialFoam
+runApplication $(getApplication)
+
+
+#runApplication decomposePar -cellDist
+#runParallel renumberMesh -overwrite >> logMeshGeneration.txt
+#runParallel patchSummary 
+
+#runParallel potentialFoam 
+#runParallel $(getApplication)
+
+#runApplication reconstructPar -latestTime
+# ----------------------------------------------------------------- end-of-file
