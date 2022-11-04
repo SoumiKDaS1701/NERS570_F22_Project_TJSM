@@ -1,0 +1,105 @@
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object blockMeshDict;
+}
+
+
+x_in		-10;
+x_out		10;
+				
+z_bottom	-2;
+z_top		2;
+		
+y_left		2;
+y_right		-2;
+		
+		
+Nx	       100;
+Ny	       20;
+Nz	       20;
+		
+
+vertices  
+(
+      ( $x_in  $y_right $z_bottom )   //0
+      ( $x_out $y_right $z_bottom )   //1
+      ( $x_out $y_left  $z_bottom )   //2
+      ( $x_in  $y_left  $z_bottom )   //3
+      ( $x_in  $y_right $z_top )      //4
+      ( $x_out $y_right $z_top )      //5
+      ( $x_out $y_left  $z_top )      //6
+      ( $x_in  $y_left  $z_top )      //7
+);
+
+blocks  
+( 
+      hex ( 0 1 2 3 4 5 6 7 ) ( $Nx $Ny $Nz ) simpleGrading ( 1 1 1 )
+);
+
+edges  
+(
+);
+    
+boundary  
+(
+    inlet
+    {
+        type patch;
+        faces  
+        (
+          ( 0 4 7 3 )
+        );
+    }
+
+    outlet
+    {
+        type patch;
+        faces  
+        (
+          ( 1 2 6 5 )
+        );
+    }
+
+
+    wall
+    {
+        type wall;
+        faces  
+        (
+          ( 4 5 6 7 )
+          ( 0 3 2 1 )
+        );
+    }
+
+
+
+    symm_left
+    {
+        type cyclic;//symmetryPlane;
+	neighbourPatch symm_right;
+        faces  
+        (
+          ( 2 3 7 6 )
+        );
+    }
+    symm_right
+    {
+        type cyclic;//symmetryPlane;
+	neighbourPatch symm_left;
+        faces
+        (
+          ( 0 1 5 4 )
+        );
+    }
+
+
+);
+
+mergePatchPairs  
+(
+);
+
+fromFile true;
