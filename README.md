@@ -6,13 +6,13 @@ $ ./interp.exe. <netCDF_soln_dir> <OpenFOAM_grid_dir> <Interp_out_dir>
 
 where <netCDF_soln_dir> contains:
 
-  |-- grid
+    |-- grid
   
        |-- mesh000.nc
        
        |-- mesh001.nc 
        
-  |-- result
+    |-- result
   
        |-- mesh000sol.nc
        
@@ -21,9 +21,9 @@ where <netCDF_soln_dir> contains:
 
 and <OpenFOAM_grid_dir> contains:
 
-  |-- constant
+     |-- constant
   
-       |-- polyMesh
+         |-- polyMesh
        
             |-- points
             
