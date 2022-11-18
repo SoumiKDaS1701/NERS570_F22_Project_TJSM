@@ -10,4 +10,4 @@ main:$(SRC)
 	$(CC) -Wall -o runTest.exe $(SRC) $(LIB) $(INC) -lnetcdf
 
 clean:
-	rm ./run.exe ./runTest.exe
+	rm -f ./run.exe ./runTest.exe
