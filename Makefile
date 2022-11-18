@@ -11,7 +11,7 @@ test:$(TEST)
 	$(CC) -Wall -o runTest.exe $(TEST) $(LIB) $(INC) -lnetcdf
 
 main:$(SRC)
-	$(CC) -Wall -o runTest.exe $(SRC) $(LIB) $(INC) -lnetcdf
+	$(CC) -Wall -o interp.exe $(SRC) $(LIB) $(INC) -lnetcdf
 
 clean:
 	rm -f ./runTest.exe
