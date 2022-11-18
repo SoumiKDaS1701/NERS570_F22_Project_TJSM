@@ -8,3 +8,6 @@ default: main
 
 main:$(SRC)
 	$(CC) -Wall -o runTest.exe $(SRC) $(LIB) $(INC) -lnetcdf
+
+clean:
+	rm ./run.exe ./runTest.exe
