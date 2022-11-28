@@ -12,7 +12,6 @@ default:test
 
 test:$(TEST)
 	$(CC) -Wall -g -DWM_DP -DWM_LABEL_SIZE=${WM_LABEL_SIZE} -o runTest.exe $(TEST) $(LIB) $(INC) -lnetcdf
-	#$(CC) -Wall -g -o runTest.exe $(TEST) $(LIB) $(INC) -lnetcdf
 
 main:$(SRC)
 	$(CC) -Wall -o interp.exe $(SRC) $(LIB) $(INC) -lnetcdf
