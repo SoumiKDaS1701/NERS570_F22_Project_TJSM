@@ -2,7 +2,7 @@ Data processing and conversion of NetCDF and OpenFOAM data types
 
 Final executable should be called as:
 
-$ ./interp.exe. <netCDF_soln_dir> <OpenFOAM_grid_dir> <Interp_out_dir>
+    $ ./interp.exe. <netCDF_soln_dir> <OpenFOAM_grid_dir> <Interp_out_dir>
 
 where <netCDF_soln_dir> contains:
 
