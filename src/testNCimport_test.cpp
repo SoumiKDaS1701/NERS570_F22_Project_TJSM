@@ -31,6 +31,82 @@ void renumber
         labels[labelI] = mshToFoam[labels[labelI]];
     }
 }
+// Find face in pp which uses all vertices in meshF (in mesh point labels)
+label findFace(const primitivePatch& pp, const labelList& meshF)
+{
+    const Map<label>& meshPointMap = pp.meshPointMap();
+
+    // meshF[0] in pp labels.
+    if (!meshPointMap.found(meshF[0]))
+    {
+        Warning<< "Not using gmsh face " << meshF
+            << " since zero vertex is not on boundary of polyMesh" << endl;
+        return -1;
+    }
+
+    // Find faces using first point
+    const labelList& pFaces = pp.pointFaces()[meshPointMap[meshF[0]]];
+
+    // Go through all these faces and check if there is one which uses all of
+    // meshF vertices (in any order ;-)
+    forAll(pFaces, i)
+    {
+        label facei = pFaces[i];
+
+        const face& f = pp[facei];
+
+        // Count uses of vertices of meshF for f
+        label nMatched = 0;
+
+        forAll(f, fp)
+        {
+            if (meshF.found(f[fp]))
+            {
+                nMatched++;
+            }
+        }
+
+        if (nMatched == meshF.size())
+        {
+            return facei;
+        }
+    }
+
+    return -1;
+}
+
+
+// Same but find internal face. Expensive addressing.
+label findInternalFace(const primitiveMesh& mesh, const labelList& meshF)
+{
+    const labelList& pFaces = mesh.pointFaces()[meshF[0]];
+
+    forAll(pFaces, i)
+    {
+        label facei = pFaces[i];
+
+        const face& f = mesh.faces()[facei];
+
+        // Count uses of vertices of meshF for f
+        label nMatched = 0;
+
+        forAll(f, fp)
+        {
+            if (meshF.found(f[fp]))
+            {
+                nMatched++;
+            }
+        }
+
+        if (nMatched == meshF.size())
+        {
+            return facei;
+        }
+    }
+    return -1;
+}
+
+
 
 // Read in a NetCDF grid from a .nc file
 void load
@@ -39,7 +115,14 @@ void load
     pointField& node_xyz,
     Map<label>& ncdfToFoam,
     cellShapeList& cells,
+    labelList& patchToPhys,
     List<DynamicList<face>>& patchFaces,
+    
+    
+    size_t& nzone,
+    size_t& zone_name_str_len,
+    std::string& zone_names_str,
+    
     
     // Ideally we dont want all of these size_t attributes to be part of the method call signature...
     size_t& npartitions,
@@ -49,12 +132,14 @@ void load
     int ncid, status; // NetCDF library constants
   
     // Grid Partitioning metadata 
-    int spatial_dim_id, nprocs_id; // NetCDF variable access ID
+    int spatial_dim_id, nprocs_id, npr_comm_id, max_npr_comm_id, pr_comm_list_id; // NetCDF variable access ID
+    size_t                         npr_comm,    max_npr_comm; // Size metadata
+    int *pr_comm_list;                                        // Data storage
     
     // Face arrays
     int    nfa_ib_id, nfa_ibp1_id, nfa_i_id, nodesOfFace_size_id; // NetCDF variable access metadata
     size_t nfa_ib,    nfa_ibp1,              nodesOfFace_size;    // Size metadata
-    int                            nfa_i;                         // Size metadata
+    int                            nfa_i, nfa_b, nfa_ba, nfa_bi, nfa_bp;                         // Size metadata
     int  nodesOfFace_List_id, nodesOfFace_Pointer_id; // NetCDF variable access metadata
     int *nodesOfFace_List,    *nodesOfFace_Pointer;    // Data storage arrays
 
@@ -68,6 +153,9 @@ void load
     int nno_ib_id, node_cc_id; // NetCDF variable access ID 
     double* node_cc; // data array
     
+    // Boundary zone info
+    int    nzone_id, zone_name_str_len_id, zone_name_id, facesOfZone_id;    
+    int *facesOfZone_List;
 
     // open the input file
     Info << "Open the input file" << endl;
@@ -80,6 +168,20 @@ void load
         ERR(status);
     if ((status = nc_inq_dimlen(ncid,nprocs_id,&npartitions)))
         ERR(status);
+    if ((status = nc_inq_dimid(ncid,"npr_comm",&npr_comm_id)))
+        ERR(status);
+    if ((status = nc_inq_dimlen(ncid,npr_comm_id,&npr_comm))) // npr_comm is the number of processors with which myrank communicates
+        ERR(status); 
+    if ((status = nc_inq_dimid(ncid,"max_npr_comm",&max_npr_comm_id)))
+        ERR(status);
+    if ((status = nc_inq_dimlen(ncid,max_npr_comm_id,&max_npr_comm))) // max_npr_comm is the maximum number of processors with which any rank communicates
+        ERR(status); 
+    pr_comm_list = (int*)malloc(max_npr_comm*sizeof(int));
+    if ((status = nc_inq_varid(ncid,"pr_comm_list",&pr_comm_list_id)))
+        ERR(status);
+    if ((status = nc_get_var_int(ncid,pr_comm_list_id,pr_comm_list)))
+        ERR(status);
+    
 
     Info << "Get nfaces" << endl;      
     // get the number of faces in current partition
@@ -91,12 +193,22 @@ void load
         ERR(status);
     if ((status = nc_inq_dimlen(ncid,nfa_ibp1_id,&nfa_ibp1)))
         ERR(status);
-
+    
+    
     Info << "Get nfaces_internal" << endl;          
     // get the number of internal faces in current partition
     if ((status = nc_get_att_int(ncid,NC_GLOBAL,"nfa_i",&nfa_i)))
         ERR(status);
-
+    if ((status = nc_get_att_int(ncid,NC_GLOBAL,"nfa_b",&nfa_b)))
+        ERR(status);
+    if ((status = nc_get_att_int(ncid,NC_GLOBAL,"nfa_ba",&nfa_ba)))
+        ERR(status);
+    if ((status = nc_get_att_int(ncid,NC_GLOBAL,"nfa_bi",&nfa_bi)))
+        ERR(status);
+    if ((status = nc_get_att_int(ncid,NC_GLOBAL,"nfa_bp",&nfa_bp)))
+        ERR(status);
+    
+    
     Info << "Get ncells" << endl;              
     // get the number of cells in current partition
     if ((status = nc_inq_dimid(ncid,"ncv_ib",&ncv_ib_id)))
@@ -212,8 +324,61 @@ void load
     if ((status = nc_get_var_int(ncid,nodesOfFace_Pointer_id,nodesOfFace_Pointer)))
       ERR(status);
     
-
-
+    // Boundary info
+    if ((status = nc_inq_dimid(ncid,"nzone",&nzone_id)))
+      ERR(status);
+    if ((status = nc_inq_dimlen(ncid,nzone_id,&nzone)))
+      ERR(status);
+    if ((status = nc_inq_dimid(ncid,"zone_name_str_len",&zone_name_str_len_id)))
+      ERR(status);
+    if ((status = nc_inq_dimlen(ncid,zone_name_str_len_id,&zone_name_str_len)))
+      ERR(status);
+    char* zone_names = (char*)malloc(nzone*zone_name_str_len*sizeof(char));
+    if ((status = nc_inq_varid(ncid,"zone_name",&zone_name_id)))
+      ERR(status);
+    if ((status = nc_get_var_text(ncid,zone_name_id,zone_names)))
+      ERR(status);
+    facesOfZone_List = (int*)malloc(nzone*sizeof(int));
+    if ((status = nc_inq_varid(ncid,"faozn_iv",&facesOfZone_id)))
+      ERR(status);
+    if ((status = nc_get_var_int(ncid,facesOfZone_id,facesOfZone_List)))
+      ERR(status);
+    Info << "nzone = " << nzone << endl;
+    Info << "zone_name_str_len = " << zone_name_str_len << endl;
+    Info << "facesOfZone_id = " << facesOfZone_id << endl;
+    
+    
+    Info << endl << "nfa_i = " << nfa_i << endl;
+    Info <<         "nfa_b = " << nfa_b << endl;
+    Info << "nfa_ib = " << nfa_ib << endl;
+    
+    Info << "Interior          1 : nfa_i                                    = 1:" << nfa_i << endl;
+    Info << "Boundary          nfa_i+1 : nfa_ib                             = " << nfa_i+1 << ":"<< nfa_ib << endl;
+    Info << "Assigned boundary nfa_i+1 : nfa_i + nfa_ba                     = " << nfa_i+1 << ":"<< nfa_i+nfa_ba << endl;
+    Info << "Interior boundary nfa_i + nfa_ba + 1 : nfa_i + nfa_ba + nfa_bi = " << nfa_i+nfa_ba+1 << ":"<< nfa_i+nfa_ba+nfa_bi << endl;
+    Info << "Periodic boundary nfa_i + nfa_ba + nfa_bi + 1 : nfa_ib         = " << nfa_i+nfa_ba+nfa_bi+1 << ":"<< nfa_i+nfa_ba+nfa_bi+nfa_bp << endl;
+    
+    
+    Info << "nfa_ibp1 = " << nfa_ibp1 << endl;
+    Info << "nfa_ba = " << nfa_ba << endl;
+    Info << "nfa_bi = " << nfa_bi << endl;
+    Info << "nfa_bp = " << nfa_bp << endl;
+    
+    Info << endl;
+    for(int i=0;i<nzone;i++){
+        for (int j=0 ; j<zone_name_str_len;j++){
+            Info << zone_names[i*zone_name_str_len + j];    
+        }
+        Info << endl;
+    }
+    Info << endl;
+    for(int i=0;i<nzone;i++){
+        for (int j=0 ; j<zone_name_str_len;j++){
+            Info << zone_names[i*zone_name_str_len + j];    
+        }Info << endl;
+        Info << "facesOfZone_List["<< i <<"] = " << facesOfZone_List[i] << endl;
+    }
+     
     labelList hexPoints(8);
     cells.setSize(ncv_ib);
     const cellModel& hex = cellModel::ref(cellModel::HEX);
@@ -229,7 +394,7 @@ void load
         hexPoints[6] = nodesOfCV_List[8*i+6];
         hexPoints[7] = nodesOfCV_List[8*i+7];
         renumber(ncdfToFoam, hexPoints);
-        if (i < 10) { 
+        /*if (i < 10) { 
             Info << "At i = " << i << \
             "\n hexPoints      = " << hexPoints[0] << ", " \
             << hexPoints[1] << ", " \
@@ -248,66 +413,100 @@ void load
             << nodesOfCV_List[8*i+5] << ", " \
             << nodesOfCV_List[8*i+6] << ", " \
             << nodesOfCV_List[8*i+7] << endl;
-        }
+        }*/
         
         cells[i] = cellShape(hex, hexPoints);
-    } 
-    for(label i=0; i<10; i++){
-        Info << "At i = " << i << ", hexPoints = " << hexPoints[i] << endl;
-    } 
+    }
     
     face quadPoints(4);
     // From physical region to Foam patch
     Map<label> physToPatch;
-    /*
-    for (label i=0; i< nodesOfFace_size; i++)
-    {
-        quadPoints[0] = nodesOfFace_List[4*i];
-        quadPoints[1] = nodesOfFace_List[4*i+1];
-        quadPoints[2] = nodesOfFace_List[4*i+2];
-        quadPoints[3] = nodesOfFace_List[4*i+3];
-        
-        renumber(ncdfToFoam, quadPoints);
-        
-        Map<label>::iterator regFnd = physToPatch.find(regPhys);
 
-        label patchi = -1;
-        if (regFnd == physToPatch.end())
-        {
-            // New region. Allocate patch for it.
-            patchi = patchFaces.size();
-
-            patchFaces.setSize(patchi + 1);
-            patchToPhys.setSize(patchi + 1);
-
-            Info<< "Mapping region " << regPhys << " to Foam patch "
-                << patchi << endl;
-            physToPatch.insert(regPhys, patchi);
-            patchToPhys[patchi] = regPhys;
-        }
-        else
-        {
-            // Existing patch for region
-            patchi = regFnd();
-        }
-
-        // Add quad to correct patchFaces.
-        patchFaces[patchi].append(quadPoints);
-
-    }
+    std::string zone_name[nzone];
     
+    zone_names_str = zone_names;
 
+    for (label i=0; i<nzone; i++)
+    {   
+        zone_name[i] = zone_names_str.substr((i)*zone_name_str_len,zone_name_str_len);
+        zone_name[i].erase(std::remove_if(zone_name[i].begin(), zone_name[i].end(), ::isspace), zone_name[i].end());
+        Info << "zone_name = " << zone_name[i] << endl;
+        
+        // label of the face of each zone. end = nfa_ib
+        int zone_start_idx = facesOfZone_List[i];
+        Info << "zone_start_idx = " << zone_start_idx << endl;
+        // number of faces in each zone
+        int nface_of_zone = 0;
+        if (i<nzone-1)
+        {
+            nface_of_zone = facesOfZone_List[i+1] - facesOfZone_List[i];
+        }
+        else {nface_of_zone = nfa_ib - facesOfZone_List[i];}
+        
+        // Faces of each zone
+        for (int j=0; j<nface_of_zone; j++)
+        {
+            quadPoints[0] = nodesOfFace_List[4*(j + zone_start_idx - 1)];
+            quadPoints[1] = nodesOfFace_List[4*(j + zone_start_idx - 1) + 1];
+            quadPoints[2] = nodesOfFace_List[4*(j + zone_start_idx - 1) + 2];
+            quadPoints[3] = nodesOfFace_List[4*(j + zone_start_idx - 1) + 3];
+            renumber(ncdfToFoam, quadPoints);
+            
+            if (j < 3) { 
+                Info << "At i,j = " << i << ", " << j << \
+                "\n quadPoints      = " << quadPoints[0] << ", " \
+                << quadPoints[1] << ", " \
+                << quadPoints[2] << ", " \
+                << quadPoints[3] << ", "
+                
+                "\n nodesOfFace_List = " << nodesOfFace_List[4*(j + zone_start_idx - 1)] << ", " \
+                << nodesOfFace_List[4*(j + zone_start_idx - 1)+1] << ", " \
+                << nodesOfFace_List[4*(j + zone_start_idx - 1)+2] << ", " \
+                << nodesOfFace_List[4*(j + zone_start_idx - 1)+3] << endl;
+            }
+        
+            label patchi = -1;
+            if (j==0)
+            {
+                // New region. Allocate patch for it.
+                patchi = patchFaces.size();
+                Info << "patchFaces.size() = " << patchFaces.size() << endl;
+                patchFaces.setSize(patchi + 1);
+                patchToPhys.setSize(patchi + 1);
+                
+                
+                Info<< "Mapping region "<< zone_name[i] << " to Foam patch " << patchi << endl;
+                
+                physToPatch.insert(i, patchi);
+                patchToPhys[patchi] = i;
+            }
+            else { patchi = i; }
+            // Add quad to correct patchFaces.
+            patchFaces[patchi].append(quadPoints);
+            
+        }
+        
+        
+    }
     forAll(patchFaces, patchi)
     {
         patchFaces[patchi].shrink();
-    }*/
+    }
+    
+   
+   
 
+    
+    
+    
+    
+    
 
     // Writing polyMesh/faces file
     Info << "nodesOfFace_List[0] = " << nodesOfFace_List[0] << endl;
     Info << "nodesOfFace_Pointer[0] = " << nodesOfFace_Pointer[0] << endl;
     Info << "nodesOfFace_Pointer[1] = " << nodesOfFace_Pointer[1] << endl;
-    Info << nodesOfFace_size << "(" << endl;
+    Info << nodesOfFace_size/sizeof(int) << "(" << endl;
     for(int i=0; i<nfa_ibp1-1; i++){
       int NnodesOfThisFace = nodesOfFace_Pointer[i+1] - nodesOfFace_Pointer[i];
       Info << NnodesOfThisFace << "(";
@@ -347,20 +546,49 @@ int main(int argc, char *argv[]) {
     // Storage for all cells.
     cellShapeList cells;
     
-    
+    // Map from patch to gmsh physical region
+    labelList patchToPhys;
     // Storage for patch faces.
     List<DynamicList<face>> patchFaces(0);
+    // Name per physical region
+    Map<word> physicalNames;
 
-   
+    size_t nzone;
+    size_t zone_name_str_len;
+    std::string zone_names_str;
     
-
+    
     // Load a test netcdf grid file
-    char ncfile[60] = "../Channel-NetCDFgrid/mesh000.nc";
+    char ncfile[60] = "../Channel-NetCDFgrid/mesh003.nc";
     Info << "test"<<endl;
     size_t npartitions, nno_ib;
-    load(ncfile, points, ncdfToFoam, cells, patchFaces, npartitions, nno_ib);
-    //load(ncfile, points, npartitions, nno_ib);
-
+    load(ncfile, 
+         points, 
+         ncdfToFoam, 
+         cells, 
+         patchToPhys, 
+         patchFaces, 
+         
+         nzone,
+         zone_name_str_len,
+         zone_names_str,
+         
+         
+         npartitions, 
+         nno_ib);
+         
+         
+    Info << "Load Complete" << endl;
+    std::string zone_name[nzone];
+    
+    Info << "zone_name_str_len = " << zone_name_str_len << endl;
+    for (label i=0; i<nzone; i++)
+    {   
+        zone_name[i] = zone_names_str.substr(i*zone_name_str_len,zone_name_str_len);
+        zone_name[i].erase(std::remove_if(zone_name[i].begin(), zone_name[i].end(), ::isspace), zone_name[i].end());
+        Info << "zone_name = " << zone_name[i] << endl;
+    }
+    
 
     // Problem is that the orientation of the patchFaces does not have to
     // be consistent with the outwards orientation of the mesh faces. So
@@ -368,31 +596,23 @@ int main(int argc, char *argv[]) {
     // 1. define mesh with all boundary faces in one patch
     // 2. use the read patchFaces to find the corresponding boundary face
     //    and repatch it.
-    
+
     // Create correct number of patches
     // (but without any faces in it)
+       
+    
     faceListList boundaryFaces(patchFaces.size());
+
     wordList boundaryPatchNames(boundaryFaces.size());
-    /*
+    
     forAll(boundaryPatchNames, patchi)
     {
-        label physReg = patchToPhys[patchi];
-
-        Map<word>::const_iterator iter = physicalNames.find(physReg);
-
-        if (iter != physicalNames.end())
-        {
-            boundaryPatchNames[patchi] = iter();
-        }
-        else
-        {
-            boundaryPatchNames[patchi] = word("patch") + name(patchi);
-        }
-        Info<< "Patch " << patchi << " gets name "
-            << boundaryPatchNames[patchi] << endl;
+        boundaryPatchNames[patchi] = word(zone_name[patchi]);
+        
+        Info<< "Patch " << patchi << " gets name " << boundaryPatchNames[patchi] << endl;
     }
-    Info<< endl;*/
-    
+    Info<< endl;
+
     wordList boundaryPatchTypes(boundaryFaces.size(), polyPatch::typeName);
     word defaultFacesName = "defaultFaces";
     word defaultFacesType = polyPatch::typeName;
@@ -401,6 +621,7 @@ int main(int argc, char *argv[]) {
         boundaryFaces.size(),
         polyPatch::typeName
     );
+
     polyMesh mesh
     (
         IOobject
@@ -417,19 +638,113 @@ int main(int argc, char *argv[]) {
         defaultFacesName,
         defaultFacesType,
         boundaryPatchPhysicalTypes
-    );
+    ); 
+    
+    // Remove files now, to ensure all mesh files written are consistent.
+    mesh.removeFiles();
+    
+    repatchPolyTopoChanger repatcher(mesh);
+
+    // Now use the patchFaces to patch up the outside faces of the mesh.
+
+    // Get the patch for all the outside faces (= default patch added as last)
+    const polyPatch& pp = mesh.boundaryMesh().last();
+    Info<< "pp.meshPointMap() = " << pp.meshPointMap() << endl;
+            
+    // Storage for faceZones.
+    List<DynamicList<label>> zoneFaces(patchFaces.size());
+
+
+    // Go through all the patchFaces and find corresponding face in pp.
+    forAll(patchFaces, patchi)
+    {
+       
+        const DynamicList<face>& pFaces = patchFaces[patchi];
+
+        Info<< "Finding faces of patch " << patchi << endl;
+
+        forAll(pFaces, i)
+        {
+            const face& f = pFaces[i];
+            Info<< "f = " << f << endl;
+            Info<< "f[0] = " << f[0] << endl;
+            // Find face in pp using all vertices of f.
+            label patchFacei = findFace(pp, f);
+            
+
+            if (patchFacei != -1)
+            {
+                label meshFacei = pp.start() + patchFacei;
+
+                repatcher.changePatchID(meshFacei, patchi);
+            }
+            else
+            {
+                // Maybe internal face? If so add to faceZone with same index
+                // - might be useful.
+                label meshFacei = findInternalFace(mesh, f);
+
+                if (meshFacei != -1)
+                {
+                    zoneFaces[patchi].append(meshFacei);
+                }
+                else
+                {
+                    WarningInFunction
+                        << "Could not match gmsh face " << f
+                        << " to any of the interior or exterior faces"
+                        << " that share the same 0th point" << endl;
+                }
+            }
+        }
+        
+    }
+    Info<< nl;
+    
+    
+    
+    
     
     
     runTime.setTime(instant(runTime.constant()), 0);
+    
+    repatcher.repatch();
+    
+    // Remove empty defaultFaces
+    label defaultPatchID = mesh.boundaryMesh().findPatchID(defaultFacesName);
+    if (mesh.boundaryMesh()[defaultPatchID].size() == 0)
+    {
+        List<polyPatch*> newPatchPtrList((mesh.boundaryMesh().size() - 1));
+        label newPatchi = 0;
+        forAll(mesh.boundaryMesh(), patchi)
+        {
+            if (patchi != defaultPatchID)
+            {
+                const polyPatch& patch = mesh.boundaryMesh()[patchi];
+
+                newPatchPtrList[newPatchi] = patch.clone
+                (
+                    mesh.boundaryMesh(),
+                    newPatchi,
+                    patch.size(),
+                    patch.start()
+                ).ptr();
+
+                newPatchi++;
+            }
+        }
+        repatcher.changePatches(newPatchPtrList);
+    }
+    
     // Set the precision of the points data to 10
     IOstream::defaultPrecision(max(10u, IOstream::defaultPrecision()));
 
     mesh.write();
 
+    Info<< "End\n" << endl;
 
 
-
-
+/*
     // print test results to screen
     std::cout << "num mesh partitions = " << npartitions << std::endl;  
     std::cout << "num nodes in current partitions = " << nno_ib << std::endl;  
@@ -446,7 +761,7 @@ int main(int argc, char *argv[]) {
     for (size_t i = 0; i < 9; i++)
     {
       //std::cout << i << "th cell = ("<< cells[i] << ")" << std::endl;
-    }
+    }*/
   
   return 0;
 } 
