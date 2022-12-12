@@ -135,7 +135,7 @@ void load
     int spatial_dim_id, nprocs_id, npr_comm_id, max_npr_comm_id, pr_comm_list_id; // NetCDF variable access ID
     size_t                         npr_comm,    max_npr_comm; // Size metadata
     int *pr_comm_list;                                        // Data storage
-    
+
     // Face arrays
     int    nfa_ib_id, nfa_ibp1_id, nfa_i_id, nodesOfFace_size_id; // NetCDF variable access metadata
     size_t nfa_ib,    nfa_ibp1,              nodesOfFace_size;    // Size metadata
