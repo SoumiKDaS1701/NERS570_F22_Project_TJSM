@@ -1,0 +1,185 @@
+\hypertarget{classncdfGrid}{}\section{ncdf\+Grid Class Reference}
+\label{classncdfGrid}\index{ncdf\+Grid@{ncdf\+Grid}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classncdfGrid_a4b9acf50933fce83cce51b4a5fdd8e38}{ncdf\+Grid}} (char ncfilein\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Constructor for the \mbox{\hyperlink{classncdfGrid}{ncdf\+Grid}} class. Opens the input nc\+File and reads in global attributes. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classncdfGrid_ac436b49a9278c5828469794b6b6e0730}{load\+Meta\+Data}} (char ncfilein\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Read the metadata from the grid.\+nc file. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classncdfGrid_ac26434f84b6f27486aa330b123c3b398}\label{classncdfGrid_ac26434f84b6f27486aa330b123c3b398}} 
+void \mbox{\hyperlink{classncdfGrid_ac26434f84b6f27486aa330b123c3b398}{load\+Points}} ()
+\begin{DoxyCompactList}\small\item\em Populate the following class attributes from Net\+C\+DF grid data\+: node\+\_\+xyz -\/---$>$ Open\+F\+O\+AM point\+Field object ncdf\+To\+Foam -\/---$>$ Open\+F\+O\+AM Map$<$label$>$ object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classncdfGrid_a1b354370ae07160bddfe3ad96cc065f0}\label{classncdfGrid_a1b354370ae07160bddfe3ad96cc065f0}} 
+void \mbox{\hyperlink{classncdfGrid_a1b354370ae07160bddfe3ad96cc065f0}{load\+Cells}} ()
+\begin{DoxyCompactList}\small\item\em Populate the cells class attribute. Creates a cell\+Shape\+List open\+F\+O\+AM object from Net\+C\+DF grid data\+: \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classncdfGrid_a09c8ac34e94069193b00afb1b7db23f6}\label{classncdfGrid_a09c8ac34e94069193b00afb1b7db23f6}} 
+void \mbox{\hyperlink{classncdfGrid_a09c8ac34e94069193b00afb1b7db23f6}{load\+Faces}} ()
+\begin{DoxyCompactList}\small\item\em populate open\+F\+O\+AM label\+List objects containing face and boundary patch data from Net\+C\+DF grid.\+nc file \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classncdfGrid_a4943187aa2abf208e68520a43082e590}\label{classncdfGrid_a4943187aa2abf208e68520a43082e590}} 
+void \mbox{\hyperlink{classncdfGrid_a4943187aa2abf208e68520a43082e590}{write\+Poly\+Mesh}} ()
+\begin{DoxyCompactList}\small\item\em write the open\+F\+O\+AM poly\+Mesh to disk \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classncdfGrid_a4495be0a32dad1ad42934005196bbb38}{renumber}} (const Map$<$ label $>$ \&msh\+To\+Foam, label\+List \&labels)
+\begin{DoxyCompactList}\small\item\em renumber an array to open\+F\+O\+AM Map \end{DoxyCompactList}\item 
+label \mbox{\hyperlink{classncdfGrid_a4f0353f650720f518189b4adfa7d3b10}{find\+Face}} (const primitive\+Patch \&pp, const label\+List \&meshF)
+\begin{DoxyCompactList}\small\item\em Find face in pp which uses all vertices in meshF. \end{DoxyCompactList}\item 
+label \mbox{\hyperlink{classncdfGrid_a1ce028e8c7c31e35b386ab99f993a33d}{find\+Internal\+Face}} (const primitive\+Mesh \&mesh, const label\+List \&meshF)
+\begin{DoxyCompactList}\small\item\em Find internal face in pp which uses all vertices in meshF. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classncdfGrid_a996f594c8c6467d4234bb7e4007b5ab9}\label{classncdfGrid_a996f594c8c6467d4234bb7e4007b5ab9}} 
+size\+\_\+t {\bfseries npartitions}
+\item 
+\mbox{\Hypertarget{classncdfGrid_ae62a11ee8969a7c7e0d03d1e60525043}\label{classncdfGrid_ae62a11ee8969a7c7e0d03d1e60525043}} 
+size\+\_\+t {\bfseries max\+\_\+npr\+\_\+comm}
+\item 
+\mbox{\Hypertarget{classncdfGrid_aa1ee4fe7a5b8b0870b8d597424c94713}\label{classncdfGrid_aa1ee4fe7a5b8b0870b8d597424c94713}} 
+int {\bfseries npr\+\_\+comm}
+\item 
+\mbox{\Hypertarget{classncdfGrid_adf71ab05d66ecc28a04c90c466a9b3ca}\label{classncdfGrid_adf71ab05d66ecc28a04c90c466a9b3ca}} 
+size\+\_\+t {\bfseries nfa\+\_\+ib}
+\item 
+\mbox{\Hypertarget{classncdfGrid_acc57e743a9d4d584bfed3eb81d6f37f5}\label{classncdfGrid_acc57e743a9d4d584bfed3eb81d6f37f5}} 
+size\+\_\+t {\bfseries nfa\+\_\+ibp1}
+\item 
+\mbox{\Hypertarget{classncdfGrid_ad67de2c38c120d19d6a5731ea9d9d766}\label{classncdfGrid_ad67de2c38c120d19d6a5731ea9d9d766}} 
+size\+\_\+t {\bfseries nno\+\_\+ib}
+\item 
+\mbox{\Hypertarget{classncdfGrid_ab98b725efc6895235ea5a101886693d1}\label{classncdfGrid_ab98b725efc6895235ea5a101886693d1}} 
+size\+\_\+t {\bfseries ncv\+\_\+ib}
+\item 
+\mbox{\Hypertarget{classncdfGrid_ad8af40064fd69b34ca8e56f9faa90521}\label{classncdfGrid_ad8af40064fd69b34ca8e56f9faa90521}} 
+size\+\_\+t {\bfseries ncv\+\_\+ibp1}
+\item 
+\mbox{\Hypertarget{classncdfGrid_a315d18642f3d50c7a65e2aee0c56abf3}\label{classncdfGrid_a315d18642f3d50c7a65e2aee0c56abf3}} 
+int {\bfseries nfa\+\_\+i}
+\item 
+\mbox{\Hypertarget{classncdfGrid_a6d88b312985f9a5730227016f91a4d22}\label{classncdfGrid_a6d88b312985f9a5730227016f91a4d22}} 
+int {\bfseries nfa\+\_\+b}
+\item 
+\mbox{\Hypertarget{classncdfGrid_a25ea8cc3bf4dd0b8b6dc876ed4174f62}\label{classncdfGrid_a25ea8cc3bf4dd0b8b6dc876ed4174f62}} 
+int {\bfseries nfa\+\_\+ba}
+\item 
+\mbox{\Hypertarget{classncdfGrid_ad63906bc4bcf4f69335c13723bcf60a1}\label{classncdfGrid_ad63906bc4bcf4f69335c13723bcf60a1}} 
+int {\bfseries nfa\+\_\+bi}
+\item 
+\mbox{\Hypertarget{classncdfGrid_af8c208eb375a16dbb611bfd3844ca87b}\label{classncdfGrid_af8c208eb375a16dbb611bfd3844ca87b}} 
+int {\bfseries nfa\+\_\+bp}
+\item 
+\mbox{\Hypertarget{classncdfGrid_a9969da386f4ce61acaba454946c8a0ed}\label{classncdfGrid_a9969da386f4ce61acaba454946c8a0ed}} 
+int $\ast$ {\bfseries pr\+\_\+comm\+\_\+list}
+\item 
+\mbox{\Hypertarget{classncdfGrid_ac6123a7753a6bd65acddc55ce69386d5}\label{classncdfGrid_ac6123a7753a6bd65acddc55ce69386d5}} 
+double $\ast$ {\bfseries node\+\_\+cc}
+\item 
+\mbox{\Hypertarget{classncdfGrid_a20801c105799b394bb87c254700ed1ac}\label{classncdfGrid_a20801c105799b394bb87c254700ed1ac}} 
+std\+::string {\bfseries zone\+\_\+name} \mbox{[}$\,$\mbox{]}
+\item 
+\mbox{\Hypertarget{classncdfGrid_ad86c7fc276892d574c33a711a1847f53}\label{classncdfGrid_ad86c7fc276892d574c33a711a1847f53}} 
+point\+Field {\bfseries node\+\_\+xyz}
+\item 
+\mbox{\Hypertarget{classncdfGrid_a009a31e5ffc429f7f328a5c6ab5a1f5a}\label{classncdfGrid_a009a31e5ffc429f7f328a5c6ab5a1f5a}} 
+Map$<$ label $>$ {\bfseries ncdf\+To\+Foam}
+\item 
+\mbox{\Hypertarget{classncdfGrid_a225ea15177c0956632504625bb047695}\label{classncdfGrid_a225ea15177c0956632504625bb047695}} 
+cell\+Shape\+List {\bfseries cells}
+\item 
+\mbox{\Hypertarget{classncdfGrid_a00bef3dec3224873739eb1246559e932}\label{classncdfGrid_a00bef3dec3224873739eb1246559e932}} 
+label\+List {\bfseries patch\+To\+Phys}
+\item 
+\mbox{\Hypertarget{classncdfGrid_a0db052391d2acdde9dfc7e076c812612}\label{classncdfGrid_a0db052391d2acdde9dfc7e076c812612}} 
+List$<$ Dynamic\+List$<$ face $>$ $>$ {\bfseries patch\+Faces}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classncdfGrid_a4b9acf50933fce83cce51b4a5fdd8e38}\label{classncdfGrid_a4b9acf50933fce83cce51b4a5fdd8e38}} 
+\index{ncdf\+Grid@{ncdf\+Grid}!ncdf\+Grid@{ncdf\+Grid}}
+\index{ncdf\+Grid@{ncdf\+Grid}!ncdf\+Grid@{ncdf\+Grid}}
+\subsubsection{\texorpdfstring{ncdf\+Grid()}{ncdfGrid()}}
+{\footnotesize\ttfamily ncdf\+Grid\+::ncdf\+Grid (\begin{DoxyParamCaption}\item[{char}]{ncfilein\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Constructor for the \mbox{\hyperlink{classncdfGrid}{ncdf\+Grid}} class. Opens the input nc\+File and reads in global attributes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ncfilein} & Path to net\+C\+DF input file mesh partition \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classncdfGrid_a4f0353f650720f518189b4adfa7d3b10}\label{classncdfGrid_a4f0353f650720f518189b4adfa7d3b10}} 
+\index{ncdf\+Grid@{ncdf\+Grid}!find\+Face@{find\+Face}}
+\index{find\+Face@{find\+Face}!ncdf\+Grid@{ncdf\+Grid}}
+\subsubsection{\texorpdfstring{find\+Face()}{findFace()}}
+{\footnotesize\ttfamily label ncdf\+Grid\+::find\+Face (\begin{DoxyParamCaption}\item[{const primitive\+Patch \&}]{pp,  }\item[{const label\+List \&}]{meshF }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Find face in pp which uses all vertices in meshF. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pp} & primitive\+Patch object \\
+\hline
+{\em meshF} & label\+List object to query \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classncdfGrid_a1ce028e8c7c31e35b386ab99f993a33d}\label{classncdfGrid_a1ce028e8c7c31e35b386ab99f993a33d}} 
+\index{ncdf\+Grid@{ncdf\+Grid}!find\+Internal\+Face@{find\+Internal\+Face}}
+\index{find\+Internal\+Face@{find\+Internal\+Face}!ncdf\+Grid@{ncdf\+Grid}}
+\subsubsection{\texorpdfstring{find\+Internal\+Face()}{findInternalFace()}}
+{\footnotesize\ttfamily label ncdf\+Grid\+::find\+Internal\+Face (\begin{DoxyParamCaption}\item[{const primitive\+Mesh \&}]{mesh,  }\item[{const label\+List \&}]{meshF }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Find internal face in pp which uses all vertices in meshF. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pp} & primitive\+Patch object \\
+\hline
+{\em meshF} & label\+List object to query \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classncdfGrid_ac436b49a9278c5828469794b6b6e0730}\label{classncdfGrid_ac436b49a9278c5828469794b6b6e0730}} 
+\index{ncdf\+Grid@{ncdf\+Grid}!load\+Meta\+Data@{load\+Meta\+Data}}
+\index{load\+Meta\+Data@{load\+Meta\+Data}!ncdf\+Grid@{ncdf\+Grid}}
+\subsubsection{\texorpdfstring{load\+Meta\+Data()}{loadMetaData()}}
+{\footnotesize\ttfamily void ncdf\+Grid\+::load\+Meta\+Data (\begin{DoxyParamCaption}\item[{char}]{ncfilein\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Read the metadata from the grid.\+nc file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ncfilein} & Path to net\+C\+DF input file mesh partition \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classncdfGrid_a4495be0a32dad1ad42934005196bbb38}\label{classncdfGrid_a4495be0a32dad1ad42934005196bbb38}} 
+\index{ncdf\+Grid@{ncdf\+Grid}!renumber@{renumber}}
+\index{renumber@{renumber}!ncdf\+Grid@{ncdf\+Grid}}
+\subsubsection{\texorpdfstring{renumber()}{renumber()}}
+{\footnotesize\ttfamily void ncdf\+Grid\+::renumber (\begin{DoxyParamCaption}\item[{const Map$<$ label $>$ \&}]{msh\+To\+Foam,  }\item[{label\+List \&}]{labels }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+renumber an array to open\+F\+O\+AM Map 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msh\+To\+Foam} & const Map$<$label$>$ \\
+\hline
+{\em labels} & label\+List \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/ncdf\+To\+Foam.\+hpp\end{DoxyCompactItemize}
