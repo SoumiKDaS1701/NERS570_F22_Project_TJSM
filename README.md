@@ -5,7 +5,7 @@ This package provides data processing and conversion between NetCDF and OpenFOAM
 
 Final executable should be called as:
 
-    $ ncdfToFOAM mesh000.nc
+    $ ncdfToFoam mesh000.nc
 
 where the present working directory contains:
 
