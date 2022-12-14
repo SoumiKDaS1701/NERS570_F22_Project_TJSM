@@ -1,0 +1,419 @@
+Start testing: Dec 14 13:38 EST
+----------------------------------------------------------
+1/2 Testing: ncdfToFoam
+1/2 Test: ncdfToFoam
+Command: "/home/tleasca/NERS570_F22_Project_TJSM/OpenFOAM/OpenFOAM-v1812/platforms/linux64IccDPInt32Opt/bin/ncdfToFoam" "2x2x2_TestCube.nc"
+Directory: /home/tleasca/NERS570_F22_Project_TJSM/test
+"ncdfToFoam" start time: Dec 14 13:38 EST
+Output:
+----------------------------------------------------------
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1812                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : v1812 OPENFOAM=1812
+Arch   : "LSB;label=32;scalar=64"
+Exec   : /home/tleasca/NERS570_F22_Project_TJSM/OpenFOAM/OpenFOAM-v1812/platforms/linux64IccDPInt32Opt/bin/ncdfToFoam 2x2x2_TestCube.nc
+Date   : Dec 14 2022
+Time   : 13:38:54
+Host   : gl-login2.arc-ts.umich.edu
+PID    : 903776
+I/O    : uncollated
+Case   : /home/tleasca/NERS570_F22_Project_TJSM/test
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+test
+Open the input file
+Get nprocs
+Get nfaces
+Get nfaces_internal
+Get ncells
+Get nnodes
+nno_ibp1
+Number of Nodes (nVerts) : 27
+Get node array
+Reshape node points
+Read connectivity - Faces of each CV
+(facesOfCV_size) : 48
+Read connectivity - Nodes of each CV
+(nodesOfCV_size) : 64
+nodesOfCV_List[0] = 6
+nodesOfCV_List[1] = 11
+nodesOfCV_List[2] = 8
+nodesOfCV_List[3] = 3
+nodesOfCV_List[4] = 7
+nodesOfCV_List[5] = 12
+nodesOfCV_List[6] = 9
+nodesOfCV_List[7] = 4
+nodesOfCV_List[8] = 27
+nodesOfCV_List[9] = 5
+Read connectivity - Nodes of each face
+(nodesOfFace_size) : 144
+nzone = 7
+zone_name_str_len = 50
+facesOfZone_id = 16
+
+nfa_i = 12
+nfa_b = 24
+nfa_ib = 36
+Interior          1 : nfa_i                                    = 1:12
+Boundary          nfa_i+1 : nfa_ib                             = 13:36
+Assigned boundary nfa_i+1 : nfa_i + nfa_ba                     = 13:36
+Interior boundary nfa_i + nfa_ba + 1 : nfa_i + nfa_ba + nfa_bi = 37:36
+Periodic boundary nfa_i + nfa_ba + nfa_bi + 1 : nfa_ib         = 37:36
+nfa_ibp1 = 37
+nfa_ba = 24
+nfa_bi = 0
+nfa_bp = 0
+
+interior-unspecified                              
+x=-1                                              
+x=1                                               
+y=-1                                              
+y=1                                               
+z=-1                                              
+z=1                                               
+
+interior-unspecified                              
+facesOfZone_List[0] = 1
+x=-1                                              
+facesOfZone_List[1] = 13
+x=1                                               
+facesOfZone_List[2] = 17
+y=-1                                              
+facesOfZone_List[3] = 21
+y=1                                               
+facesOfZone_List[4] = 25
+z=-1                                              
+facesOfZone_List[5] = 29
+z=1                                               
+facesOfZone_List[6] = 33
+zone_name = "x=-1"
+zone_start_idx = 13
+At i,j = 0, 0
+ quadPoints      = 24, 0, 13, 25, 
+ nodesOfFace_List = 25, 1, 14, 26
+patchFaces.size() = 0
+Mapping region "x=-1" to Foam patch 0
+At i,j = 0, 1
+ quadPoints      = 23, 1, 0, 24, 
+ nodesOfFace_List = 24, 2, 1, 25
+At i,j = 0, 2
+ quadPoints      = 19, 24, 25, 18, 
+ nodesOfFace_List = 20, 25, 26, 19
+At i,j = 0, 3
+ quadPoints      = 20, 23, 24, 19, 
+ nodesOfFace_List = 21, 24, 25, 20
+zone_name = "x=1"
+zone_start_idx = 17
+At i,j = 1, 0
+ quadPoints      = 2, 7, 8, 3, 
+ nodesOfFace_List = 3, 8, 9, 4
+patchFaces.size() = 1
+Mapping region "x=1" to Foam patch 1
+At i,j = 1, 1
+ quadPoints      = 22, 2, 3, 21, 
+ nodesOfFace_List = 23, 3, 4, 22
+At i,j = 1, 2
+ quadPoints      = 3, 8, 9, 4, 
+ nodesOfFace_List = 4, 9, 10, 5
+At i,j = 1, 3
+ quadPoints      = 21, 3, 4, 14, 
+ nodesOfFace_List = 22, 4, 5, 15
+zone_name = "y=-1"
+zone_start_idx = 21
+At i,j = 2, 0
+ quadPoints      = 0, 11, 10, 13, 
+ nodesOfFace_List = 1, 12, 11, 14
+patchFaces.size() = 2
+Mapping region "y=-1" to Foam patch 2
+At i,j = 2, 1
+ quadPoints      = 1, 12, 11, 0, 
+ nodesOfFace_List = 2, 13, 12, 1
+At i,j = 2, 2
+ quadPoints      = 11, 8, 7, 10, 
+ nodesOfFace_List = 12, 9, 8, 11
+At i,j = 2, 3
+ quadPoints      = 12, 9, 8, 11, 
+ nodesOfFace_List = 13, 10, 9, 12
+zone_name = "y=1"
+zone_start_idx = 25
+At i,j = 3, 0
+ quadPoints      = 16, 15, 22, 21, 
+ nodesOfFace_List = 17, 16, 23, 22
+patchFaces.size() = 3
+Mapping region "y=1" to Foam patch 3
+At i,j = 3, 1
+ quadPoints      = 17, 16, 21, 14, 
+ nodesOfFace_List = 18, 17, 22, 15
+At i,j = 3, 2
+ quadPoints      = 19, 18, 15, 16, 
+ nodesOfFace_List = 20, 19, 16, 17
+At i,j = 3, 3
+ quadPoints      = 20, 19, 16, 17, 
+ nodesOfFace_List = 21, 20, 17, 18
+zone_name = "z=-1"
+zone_start_idx = 29
+At i,j = 4, 0
+ quadPoints      = 15, 5, 2, 22, 
+ nodesOfFace_List = 16, 6, 3, 23
+patchFaces.size() = 4
+Mapping region "z=-1" to Foam patch 4
+At i,j = 4, 1
+ quadPoints      = 5, 10, 7, 2, 
+ nodesOfFace_List = 6, 11, 8, 3
+At i,j = 4, 2
+ quadPoints      = 18, 25, 5, 15, 
+ nodesOfFace_List = 19, 26, 6, 16
+At i,j = 4, 3
+ quadPoints      = 25, 13, 10, 5, 
+ nodesOfFace_List = 26, 14, 11, 6
+zone_name = "z=1"
+zone_start_idx = 33
+At i,j = 5, 0
+ quadPoints      = 17, 14, 4, 26, 
+ nodesOfFace_List = 18, 15, 5, 27
+patchFaces.size() = 5
+Mapping region "z=1" to Foam patch 5
+At i,j = 5, 1
+ quadPoints      = 26, 4, 9, 12, 
+ nodesOfFace_List = 27, 5, 10, 13
+At i,j = 5, 2
+ quadPoints      = 20, 17, 26, 23, 
+ nodesOfFace_List = 21, 18, 27, 24
+Load Complete
+zone_name_str_len = 50
+zone_name = "x=-1"
+zone_name = "x=1"
+zone_name = "y=-1"
+zone_name = "y=1"
+zone_name = "z=-1"
+zone_name = "z=1"
+Patch 0 gets name x=-1
+Patch 1 gets name x=1
+Patch 2 gets name y=-1
+Patch 3 gets name y=1
+Patch 4 gets name z=-1
+Patch 5 gets name z=1
+
+--> FOAM Warning : 
+    From function Foam::polyMesh::polyMesh(const Foam::IOobject &, Foam::Field<Foam::Vector<double>> &&, const Foam::List<Foam::cellShape> &, const Foam::List<Foam::List<Foam::face>> &, const Foam::List<Foam::word> &, const Foam::List<Foam::word> &, const Foam::word &, const Foam::word &, const Foam::List<Foam::word> &, bool)
+    in file meshes/polyMesh/polyMeshFromShapeMesh.C at line 590
+    Found 24 undefined faces in mesh; adding to default patch.
+pp.meshPointMap() = 
+26
+(
+0 11
+1 15
+2 4
+3 5
+4 7
+5 6
+7 1
+8 2
+9 8
+10 0
+11 3
+12 10
+13 14
+14 21
+15 18
+16 19
+17 22
+18 24
+19 23
+20 25
+21 20
+22 17
+23 16
+24 12
+25 13
+26 9
+)
+Finding faces of patch 0
+f = 4(24 0 13 25)
+f[0] = 24
+f = 4(23 1 0 24)
+f[0] = 23
+f = 4(19 24 25 18)
+f[0] = 19
+f = 4(20 23 24 19)
+f[0] = 20
+Finding faces of patch 1
+f = 4(2 7 8 3)
+f[0] = 2
+f = 4(22 2 3 21)
+f[0] = 22
+f = 4(3 8 9 4)
+f[0] = 3
+f = 4(21 3 4 14)
+f[0] = 21
+Finding faces of patch 2
+f = 4(0 11 10 13)
+f[0] = 0
+f = 4(1 12 11 0)
+f[0] = 1
+f = 4(11 8 7 10)
+f[0] = 11
+f = 4(12 9 8 11)
+f[0] = 12
+Finding faces of patch 3
+f = 4(16 15 22 21)
+f[0] = 16
+f = 4(17 16 21 14)
+f[0] = 17
+f = 4(19 18 15 16)
+f[0] = 19
+f = 4(20 19 16 17)
+f[0] = 20
+Finding faces of patch 4
+f = 4(15 5 2 22)
+f[0] = 15
+f = 4(5 10 7 2)
+f[0] = 5
+f = 4(18 25 5 15)
+f[0] = 18
+f = 4(25 13 10 5)
+f[0] = 25
+Finding faces of patch 5
+f = 4(17 14 4 26)
+f[0] = 17
+f = 4(26 4 9 12)
+f[0] = 26
+f = 4(20 17 26 23)
+f[0] = 20
+
+End
+
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"ncdfToFoam" end time: Dec 14 13:38 EST
+"ncdfToFoam" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: checkMesh
+2/2 Test: checkMesh
+Command: "/home/tleasca/NERS570_F22_Project_TJSM/OpenFOAM/OpenFOAM-v1812/platforms/linux64IccDPInt32Opt/bin/checkMesh"
+Directory: /home/tleasca/NERS570_F22_Project_TJSM/test
+"checkMesh" start time: Dec 14 13:38 EST
+Output:
+----------------------------------------------------------
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1812                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : v1812 OPENFOAM=1812
+Arch   : "LSB;label=32;scalar=64"
+Exec   : /home/tleasca/NERS570_F22_Project_TJSM/OpenFOAM/OpenFOAM-v1812/platforms/linux64IccDPInt32Opt/bin/checkMesh
+Date   : Dec 14 2022
+Time   : 13:38:54
+Host   : gl-login2.arc-ts.umich.edu
+PID    : 903779
+I/O    : uncollated
+Case   : /home/tleasca/NERS570_F22_Project_TJSM/test
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+--> FOAM Warning : 
+    From function static Foam::List<Foam::instant> Foam::timeSelector::select0(Foam::Time &, const Foam::argList &)
+    in file db/Time/timeSelector.C at line 255
+    No time specified or available, selecting 'constant'
+Create mesh for time = constant
+
+Time = constant
+
+Mesh stats
+    points:           27
+    faces:            36
+    internal faces:   12
+    cells:            8
+    faces per cell:   6
+    boundary patches: 7
+    point zones:      0
+    face zones:       0
+    cell zones:       0
+
+Overall number of cells of each type:
+    hexahedra:     8
+    prisms:        0
+    wedges:        0
+    pyramids:      0
+    tet wedges:    0
+    tetrahedra:    0
+    polyhedra:     0
+
+Checking topology...
+    Boundary definition OK.
+    Cell to face addressing OK.
+    Point usage OK.
+    Upper triangular ordering OK.
+    Face vertices OK.
+    Number of regions: 1 (OK).
+
+Checking patch topology for multiply connected surfaces...
+    Patch               Faces    Points   Surface topology                  
+    x=-1                4        9        ok (non-closed singly connected)  
+    x=1                 4        9        ok (non-closed singly connected)  
+    y=-1                4        9        ok (non-closed singly connected)  
+    y=1                 4        9        ok (non-closed singly connected)  
+    z=-1                4        9        ok (non-closed singly connected)  
+    z=1                 3        8        ok (non-closed singly connected)  
+    defaultFaces        1        4        ok (non-closed singly connected)  
+
+Checking faceZone topology for multiply connected surfaces...
+    No faceZones found.
+
+Checking basic cellZone addressing...
+    No cellZones found.
+
+Checking geometry...
+    Overall domain bounding box (-1 -1 -1) (1 1 1)
+    Mesh has 3 geometric (non-empty/wedge) directions (1 1 1)
+    Mesh has 3 solution (non-empty) directions (1 1 1)
+ ***Boundary openness (-0.08333333333333333 0.08333333333333333 -0.08333333333333333) possible hole in boundary description.
+ ***Open cells found, max cell openness: 1, number of open cells 3
+  <<Writing 3 non closed cells to set nonClosedCells
+  <<Writing 1 cells with high aspect ratio to set highAspectRatioCells
+    Minimum face area = 1. Maximum face area = 1.  Face area magnitudes OK.
+ ***Zero or negative cell volume detected.  Minimum negative volume: -0.6666666666666666, Number of negative volume cells: 1
+  <<Writing 1 zero volume cells to set zeroVolumeCells
+    Mesh non-orthogonality Max: 171.0273733851036 average: 48.47116397297964
+ ***Number of non-orthogonality errors: 2.
+  <<Writing 2 non-orthogonal faces to set nonOrthoFaces
+ ***Error in face pyramids: 7 faces are incorrectly oriented.
+  <<Writing 5 faces with incorrect orientation to set wrongOrientedFaces
+    Max skewness = 0.375 OK.
+    Coupled point location match (average 0) OK.
+
+Failed 5 mesh checks.
+
+End
+
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"checkMesh" end time: Dec 14 13:38 EST
+"checkMesh" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Dec 14 13:38 EST

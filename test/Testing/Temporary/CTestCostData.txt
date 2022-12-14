@@ -1,0 +1,9 @@
+testNCimport_test 0 0
+testNCimport_test.dwo 0 0
+ncdfToFOAM 0 0
+ncdfToFoam 8 0.0118632
+ncdfToPolyMesh 5 0.0658362
+runTranslator 2 0
+meshValidity 0 0
+checkMesh 4 0.0210531
+---
