@@ -1,4 +1,3 @@
-
-testNCimport_test.cpp
+ncImport_procedural.cpp
 
 EXE = $(FOAM_APPBIN)/ncdfToFoam
