@@ -28,8 +28,12 @@ void renumber
 {
     forAll(labels, labelI)
     {
+        Info << "Label_i =" << labelI << endl;
+        Info << "Labels[labelI] =" << labels[labelI] << endl;
+        Info << "mshToFoam[Labels[labelI]] =" << mshToFoam[labels[labelI]] << endl;
         labels[labelI] = mshToFoam[labels[labelI]];
     }
+    Info << "       leaving renumber function" << endl;
 }
 // Find face in pp which uses all vertices in meshF (in mesh point labels)
 label findFace(const primitivePatch& pp, const labelList& meshF)
@@ -386,15 +390,28 @@ void load
     int nface_of_zone_list[3] = {nfa_ba, nfa_bi, nfa_bp};
     
     for(label i=0; i<ncv_ib; i++){
-        hexPoints[0] = nodesOfCV_List[8*i];
-        hexPoints[1] = nodesOfCV_List[8*i+1];
-        hexPoints[2] = nodesOfCV_List[8*i+2];
-        hexPoints[3] = nodesOfCV_List[8*i+3];
-        hexPoints[4] = nodesOfCV_List[8*i+4];
-        hexPoints[5] = nodesOfCV_List[8*i+5];
-        hexPoints[6] = nodesOfCV_List[8*i+6];
-        hexPoints[7] = nodesOfCV_List[8*i+7];
-        renumber(ncdfToFoam, hexPoints);
+      label nfacesOfCell = facesOfCV_Pointer[i+1] - facesOfCV_Pointer[i];
+      label nNodesOfCell = nodesOfCV_Pointer[i+1] - nodesOfCV_Pointer[i];
+      Info << "nNodesOfCell=" << nNodesOfCell << endl;
+      Info << "nfacesOfCell=" << nfacesOfCell << endl;
+      //for(label j=0; j<nfacesOfCell; j++){
+      //  label globalFaceIndex = facesOfCV_List[facesOfCV_Pointer[i] - 1 + j]];
+      //  label NnodesOfThisFace = nodesOfFace_Pointer[globalFaceIndex + 1]- nodesOfFace_Pointer[globalFaceIndex];
+        for(label k=0; k<nNodesOfCell; k++){
+          Info << "[i,j,k] = " << i << "," << "j" << "," << k << endl;
+          hexPoints[k] = nodesOfCV_List[nodesOfCV_Pointer[i] - 1 + k];
+          //label globalNodeIndex = nodesOfFace_List[nodesOfFace_Pointer[j + k]];
+          //hexPoints[k] = globalNodeIndex;
+          //hexPoints[1] = nodesOfCV_List[8*i+1];
+          //hexPoints[2] = nodesOfCV_List[8*i+2];
+          //hexPoints[3] = nodesOfCV_List[8*i+3];
+          //hexPoints[4] = nodesOfCV_List[8*i+4];
+          //hexPoints[5] = nodesOfCV_List[8*i+5];
+          //hexPoints[6] = nodesOfCV_List[8*i+6];
+          //hexPoints[7] = nodesOfCV_List[8*i+7];
+        }
+      //}
+      renumber(ncdfToFoam, hexPoints);
         /*if (i < 10) { 
             Info << "At i = " << i << \
             "\n hexPoints      = " << hexPoints[0] << ", " \
@@ -418,6 +435,8 @@ void load
         
         cells[i] = cellShape(hex, hexPoints);
     }
+    
+    Info << "Interpreting patches: " << endl;
     
     face quadPoints(4);
     // From physical region to Foam patch
