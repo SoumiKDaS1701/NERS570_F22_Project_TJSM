@@ -1,29 +1,26 @@
-Data processing and conversion of NetCDF and OpenFOAM data types
+This package provides data processing and conversion between NetCDF and OpenFOAM data types. It uses a WMake based build system to align with the OpenFOAM build framework. It requires that the NetCDF library be installed to the lib/ directory. Additionally, a local copy of OpenFOAM should be installed with sufficient permissions for the user to be able to write a new executable to the ${FOAM_APPBIN} directory. Before building our executable, the user will need to source the OpenFOAM bashrc to set the relevant $FOAM environment variables
+
 
 Final executable should be called as:
 
-    $ ./interp.exe. <netCDF_soln_dir> <OpenFOAM_grid_dir> <Interp_out_dir>
+    $ ncdfToFOAM mesh000.nc
 
-where <netCDF_soln_dir> contains:
+where the present working directory contains:
 
-    |-- grid
   
-       |-- mesh000.nc
+    |-- mesh000.nc
        
-       |-- mesh001.nc 
+    |-- mesh001.nc 
        
     |-- result
   
-       |-- mesh000sol.nc
+        |-- mesh000sol.nc
        
-       |-- mesh001sol.nc
-       
-
-and <OpenFOAM_grid_dir> contains:
-
-     |-- constant
+        |-- mesh001sol.nc
+   
+    |-- constant
   
-         |-- polyMesh
+        |-- polyMesh
        
             |-- points
             
@@ -32,3 +29,9 @@ and <OpenFOAM_grid_dir> contains:
             |-- owner
             
             |-- faces
+
+    |-- system
+        
+        |-- controlDict
+
+        |-- fvSolution
