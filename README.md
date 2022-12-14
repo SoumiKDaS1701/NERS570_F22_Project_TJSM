@@ -2,6 +2,13 @@ This package provides data processing and conversion between NetCDF and OpenFOAM
 
     $ export ncdfToFoamRoot=/path/to/git/clone
 
+The ncdfToFoam utility can be compiled from the top level directory of this repo by executing:
+       
+    $ wmake src
+    
+The compilation can be verified by entering the test directory and executing:
+   
+    $ ctest
 
 Final executable should be called as:
 
