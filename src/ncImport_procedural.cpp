@@ -402,13 +402,6 @@ void load
           hexPoints[k] = nodesOfCV_List[nodesOfCV_Pointer[i] - 1 + k];
           //label globalNodeIndex = nodesOfFace_List[nodesOfFace_Pointer[j + k]];
           //hexPoints[k] = globalNodeIndex;
-          //hexPoints[1] = nodesOfCV_List[8*i+1];
-          //hexPoints[2] = nodesOfCV_List[8*i+2];
-          //hexPoints[3] = nodesOfCV_List[8*i+3];
-          //hexPoints[4] = nodesOfCV_List[8*i+4];
-          //hexPoints[5] = nodesOfCV_List[8*i+5];
-          //hexPoints[6] = nodesOfCV_List[8*i+6];
-          //hexPoints[7] = nodesOfCV_List[8*i+7];
         }
       //}
       renumber(ncdfToFoam, hexPoints);
