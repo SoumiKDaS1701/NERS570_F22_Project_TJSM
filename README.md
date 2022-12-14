@@ -38,13 +38,15 @@ where the present working directory contains:
 The program will generate `polyMesh` in `constant`
 
     |-- constant
+        
+        |-- polyMesh
 
-        |-- points
+            |-- points
 
-        |-- faces
+            |-- faces
 
-        |-- boundary
+            |-- boundary
 
-        |-- owner
+            |-- owner
 
-        |-- neighbour 
+            |-- neighbour 
