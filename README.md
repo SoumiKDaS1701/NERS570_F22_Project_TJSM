@@ -28,16 +28,6 @@ where the present working directory contains:
         |-- mesh001sol.nc
    
     |-- constant
-  
-        |-- polyMesh
-       
-            |-- points
-            
-            |-- neighbour
-            
-            |-- owner
-            
-            |-- faces
 
     |-- system
         
