@@ -111,7 +111,7 @@ label findInternalFace(const primitiveMesh& mesh, const labelList& meshF)
 // Read in a NetCDF grid from a .nc file
 void load
 (
-    char ncfilein[],
+    const Foam::string filein,
     pointField& node_xyz,
     Map<label>& ncdfToFoam,
     cellShapeList& cells,
@@ -128,13 +128,14 @@ void load
     size_t& npartitions,
     size_t& nno_ib)
 {
+    const char* ncfilein = filein.c_str();
    
     int ncid, status; // NetCDF library constants
   
     // Grid Partitioning metadata 
-    int spatial_dim_id, nprocs_id, npr_comm_id, max_npr_comm_id, pr_comm_list_id; // NetCDF variable access ID
-    size_t                         npr_comm,    max_npr_comm; // Size metadata
-    int *pr_comm_list;                                        // Data storage
+    int spatial_dim_id, nprocs_id, max_npr_comm_id, pr_comm_list_id; // NetCDF variable access ID
+    size_t                         max_npr_comm;                     // Size metadata
+    int npr_comm, *pr_comm_list;                                     // Data storage
 
     // Face arrays
     int    nfa_ib_id, nfa_ibp1_id, nfa_i_id, nodesOfFace_size_id; // NetCDF variable access metadata
@@ -168,9 +169,7 @@ void load
         ERR(status);
     if ((status = nc_inq_dimlen(ncid,nprocs_id,&npartitions)))
         ERR(status);
-    if ((status = nc_inq_dimid(ncid,"npr_comm",&npr_comm_id)))
-        ERR(status);
-    if ((status = nc_inq_dimlen(ncid,npr_comm_id,&npr_comm))) // npr_comm is the number of processors with which myrank communicates
+    if ((status = nc_get_att_int(ncid,NC_GLOBAL,"npr_comm",&npr_comm))) // npr_comm is the number of processors with which myrank communicates
         ERR(status); 
     if ((status = nc_inq_dimid(ncid,"max_npr_comm",&max_npr_comm_id)))
         ERR(status);
@@ -383,7 +382,9 @@ void load
     cells.setSize(ncv_ib);
     const cellModel& hex = cellModel::ref(cellModel::HEX);
     
-
+    int zone_start_idx_list[3] = {nfa_i+1, nfa_i + nfa_ba + 1, nfa_i + nfa_ba + nfa_bi + 1};
+    int nface_of_zone_list[3] = {nfa_ba, nfa_bi, nfa_bp};
+    
     for(label i=0; i<ncv_ib; i++){
         hexPoints[0] = nodesOfCV_List[8*i];
         hexPoints[1] = nodesOfCV_List[8*i+1];
@@ -394,26 +395,6 @@ void load
         hexPoints[6] = nodesOfCV_List[8*i+6];
         hexPoints[7] = nodesOfCV_List[8*i+7];
         renumber(ncdfToFoam, hexPoints);
-        /*if (i < 10) { 
-            Info << "At i = " << i << \
-            "\n hexPoints      = " << hexPoints[0] << ", " \
-            << hexPoints[1] << ", " \
-            << hexPoints[2] << ", " \
-            << hexPoints[3] << ", " \
-            << hexPoints[4] << ", " \
-            << hexPoints[5] << ", " \
-            << hexPoints[6] << ", " \
-            << hexPoints[7] << \
-            
-            "\n nodesOfCV_List = " << nodesOfCV_List[8*i] << ", " \
-            << nodesOfCV_List[8*i+1] << ", " \
-            << nodesOfCV_List[8*i+2] << ", " \
-            << nodesOfCV_List[8*i+3] << ", " \
-            << nodesOfCV_List[8*i+4] << ", " \
-            << nodesOfCV_List[8*i+5] << ", " \
-            << nodesOfCV_List[8*i+6] << ", " \
-            << nodesOfCV_List[8*i+7] << endl;
-        }*/
         
         cells[i] = cellShape(hex, hexPoints);
     }
@@ -426,23 +407,23 @@ void load
     
     zone_names_str = zone_names;
 
-    for (label i=0; i<nzone; i++)
+    for (label i=0; i<nzone-1; i++)
     {   
-        zone_name[i] = zone_names_str.substr((i)*zone_name_str_len,zone_name_str_len);
+        zone_name[i] = zone_names_str.substr((i+1)*zone_name_str_len,zone_name_str_len);
         zone_name[i].erase(std::remove_if(zone_name[i].begin(), zone_name[i].end(), ::isspace), zone_name[i].end());
-        Info << "zone_name = " << zone_name[i] << endl;
         
         // label of the face of each zone. end = nfa_ib
-        int zone_start_idx = facesOfZone_List[i];
-        Info << "zone_start_idx = " << zone_start_idx << endl;
+        int zone_start_idx = facesOfZone_List[i+1];
         // number of faces in each zone
         int nface_of_zone = 0;
-        if (i<nzone-1)
+        if (i<nzone-2)
         {
-            nface_of_zone = facesOfZone_List[i+1] - facesOfZone_List[i];
+            nface_of_zone = facesOfZone_List[i+2] - facesOfZone_List[i+1];
         }
-        else {nface_of_zone = nfa_ib - facesOfZone_List[i];}
+        else {nface_of_zone = nfa_ib - facesOfZone_List[i+1];}
         
+        //int zone_start_idx = zone_start_idx_list[i];
+        //int nface_of_zone = nface_of_zone_list[i];
         // Faces of each zone
         for (int j=0; j<nface_of_zone; j++)
         {
@@ -452,25 +433,11 @@ void load
             quadPoints[3] = nodesOfFace_List[4*(j + zone_start_idx - 1) + 3];
             renumber(ncdfToFoam, quadPoints);
             
-            if (j < 3) { 
-                Info << "At i,j = " << i << ", " << j << \
-                "\n quadPoints      = " << quadPoints[0] << ", " \
-                << quadPoints[1] << ", " \
-                << quadPoints[2] << ", " \
-                << quadPoints[3] << ", "
-                
-                "\n nodesOfFace_List = " << nodesOfFace_List[4*(j + zone_start_idx - 1)] << ", " \
-                << nodesOfFace_List[4*(j + zone_start_idx - 1)+1] << ", " \
-                << nodesOfFace_List[4*(j + zone_start_idx - 1)+2] << ", " \
-                << nodesOfFace_List[4*(j + zone_start_idx - 1)+3] << endl;
-            }
-        
             label patchi = -1;
             if (j==0)
             {
                 // New region. Allocate patch for it.
                 patchi = patchFaces.size();
-                Info << "patchFaces.size() = " << patchFaces.size() << endl;
                 patchFaces.setSize(patchi + 1);
                 patchToPhys.setSize(patchi + 1);
                 
@@ -493,16 +460,47 @@ void load
         patchFaces[patchi].shrink();
     }
     
-   
-   
+    Foam::string solnFile = filein;
+    solnFile = solnFile.substr(0,solnFile.size()-3);
+    solnFile = word("result/") + solnFile + word("sol.nc");
+    const char* ncSolnFile = solnFile.c_str();
 
     
+    int ncidSoln, cv_velocity_id;
+    double *cv_vel;
+    cv_vel = (double*)malloc(3*ncv_ib*sizeof(double));
+    if ((status = nc_open(ncSolnFile,NC_NOWRITE,&ncidSoln)))
+        ERR(status);
+    if ((status = nc_inq_varid(ncidSoln,"cv_velocity",&cv_velocity_id)))
+        ERR(status);
+    if ((status = nc_get_var_double(ncidSoln,cv_velocity_id,cv_vel)))
+        ERR(status);
+    Info << "FoamFile" << endl;
+    Info << "{" << endl;
+    Info << "    version     2.0;" << endl;
+    Info << "    format      ascii;" << endl;
+    Info << "    class       volVectorField;" << endl;
+    Info << "    location    \"1000\";" << endl;
+    Info << "    object      U;" << endl;
+    Info << "}" << endl;
+    Info << "// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //" << endl;
+    Info << endl;
+    Info << "dimensions      [0 1 -1 0 0 0 0];" << endl;
+    Info << endl;
+    Info << endl;
+    Info << "internalField   nonuniform List<vector>" << endl;
+    Info << endl;
+    Info << ncv_ib << "(" << endl;
+    for(int i=0;i<ncv_ib;i++){ 
+      Info << "(" << cv_vel[3*i] <<" "<< cv_vel[3*i + 1] <<" "<< cv_vel[3*i + 2] << ")" << endl;
+    }
+    Info << ")" << endl;
     
     
     
     
 
-    // Writing polyMesh/faces file
+    /*// Writing polyMesh/faces file
     Info << "nodesOfFace_List[0] = " << nodesOfFace_List[0] << endl;
     Info << "nodesOfFace_Pointer[0] = " << nodesOfFace_Pointer[0] << endl;
     Info << "nodesOfFace_Pointer[1] = " << nodesOfFace_Pointer[1] << endl;
@@ -515,7 +513,7 @@ void load
       }
       Info << ")" << endl;
     }
-    Info << ")" << endl;
+    Info << ")" << endl;*/
 
 };
 
@@ -526,7 +524,7 @@ int main(int argc, char *argv[]) {
     (
         "Convert NetCDF to OpenFOAM"
     );
-
+    argList::addArgument(".nc file");
     #include "addRegionOption.H"
 
     #include "setRootCase.H"
@@ -540,7 +538,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Storage for points
-    pointField points;
+    pointField node_xyz;
     Map<label> ncdfToFoam;
 
     // Storage for all cells.
@@ -559,11 +557,14 @@ int main(int argc, char *argv[]) {
     
     
     // Load a test netcdf grid file
-    char ncfile[60] = "../Channel-NetCDFgrid/mesh003.nc";
+    //char ncfile[60] = "./2x2x2_TestCube.nc";
+    //char ncfile[60] = "../Channel-NetCDFgrid/mesh000.nc";
+    
     Info << "test"<<endl;
     size_t npartitions, nno_ib;
-    load(ncfile, 
-         points, 
+    //load(ncfile, 
+    load(args[1],
+         node_xyz, 
          ncdfToFoam, 
          cells, 
          patchToPhys, 
@@ -582,9 +583,9 @@ int main(int argc, char *argv[]) {
     std::string zone_name[nzone];
     
     Info << "zone_name_str_len = " << zone_name_str_len << endl;
-    for (label i=0; i<nzone; i++)
+    for (label i=0; i<nzone-1; i++)
     {   
-        zone_name[i] = zone_names_str.substr(i*zone_name_str_len,zone_name_str_len);
+        zone_name[i] = zone_names_str.substr((i+1)*zone_name_str_len,zone_name_str_len);
         zone_name[i].erase(std::remove_if(zone_name[i].begin(), zone_name[i].end(), ::isspace), zone_name[i].end());
         Info << "zone_name = " << zone_name[i] << endl;
     }
@@ -605,14 +606,6 @@ int main(int argc, char *argv[]) {
 
     wordList boundaryPatchNames(boundaryFaces.size());
     
-    forAll(boundaryPatchNames, patchi)
-    {
-        boundaryPatchNames[patchi] = word(zone_name[patchi]);
-        
-        Info<< "Patch " << patchi << " gets name " << boundaryPatchNames[patchi] << endl;
-    }
-    Info<< endl;
-
     wordList boundaryPatchTypes(boundaryFaces.size(), polyPatch::typeName);
     word defaultFacesName = "defaultFaces";
     word defaultFacesType = polyPatch::typeName;
@@ -630,7 +623,7 @@ int main(int argc, char *argv[]) {
             runTime.constant(),
             runTime
         ),
-        std::move(points),
+        std::move(node_xyz),
         cells,
         boundaryFaces,
         boundaryPatchNames,
@@ -649,7 +642,6 @@ int main(int argc, char *argv[]) {
 
     // Get the patch for all the outside faces (= default patch added as last)
     const polyPatch& pp = mesh.boundaryMesh().last();
-    Info<< "pp.meshPointMap() = " << pp.meshPointMap() << endl;
             
     // Storage for faceZones.
     List<DynamicList<label>> zoneFaces(patchFaces.size());
@@ -661,13 +653,9 @@ int main(int argc, char *argv[]) {
        
         const DynamicList<face>& pFaces = patchFaces[patchi];
 
-        Info<< "Finding faces of patch " << patchi << endl;
-
         forAll(pFaces, i)
         {
             const face& f = pFaces[i];
-            Info<< "f = " << f << endl;
-            Info<< "f[0] = " << f[0] << endl;
             // Find face in pp using all vertices of f.
             label patchFacei = findFace(pp, f);
             
@@ -691,7 +679,7 @@ int main(int argc, char *argv[]) {
                 else
                 {
                     WarningInFunction
-                        << "Could not match gmsh face " << f
+                        << "Could not match face " << f
                         << " to any of the interior or exterior faces"
                         << " that share the same 0th point" << endl;
                 }
