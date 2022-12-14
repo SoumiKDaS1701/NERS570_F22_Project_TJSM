@@ -34,3 +34,17 @@ where the present working directory contains:
         |-- controlDict
 
         |-- fvSolution
+
+The program will generate `polyMesh` in `constant`
+
+    |-- constant
+
+        |-- points
+
+        |-- faces
+
+        |-- boundary
+
+        |-- owner
+
+        |-- neighbour 
