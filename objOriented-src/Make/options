@@ -1,0 +1,32 @@
+EXE_INC = \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/lnInclude \
+    -I/home/tleasca/NERS570_F22_Project_TJSM/src \
+    -I/home/tleasca/NERS570_F22_Project_TJSM/include \
+    -I/home/tleasca/NERS570_F22_Project_TJSM/netcdf-c-4.7.4/include \
+    -I$(LIB_SRC)/OpenFOAM/lnInclude \
+    -I$(LIB_SRC)/OSspecific/POSIX \
+    -I$(LIB_SRC)/OSspecific/POSIX/cpuTime \
+    -I$(LIB_SRC)/OSspecific/POSIX/signals \
+    -I$(LIB_SRC)/finiteVolume/fvMesh \
+    -I$(LIB_SRC)/finiteVolume/fvMesh/fvBoundaryMesh \
+    -I$(LIB_SRC)/finiteVolume/fvMesh/fvPatches/fvPatch \
+    -I$(LIB_SRC)/finiteVolume/fields/fvPatchFields/fvPatchField \
+    -I$(LIB_SRC)/finiteVolume/interpolation/surfaceInterpolation/surfaceInterpolation \
+    -I$(LIB_SRC)/finiteVolume/fields/volFields \
+    -I$(LIB_SRC)/finiteVolume/fields/surfaceFields \
+    -I$(LIB_SRC)/finiteVolume/finiteVolume/fvSchemes \
+    -I$(LIB_SRC)/finiteVolume/finiteVolume/fvSolution \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/lnInclude \
+    -I$(LIB_SRC)/OpenFOAM/containers/Lists/List
+
+EXE_LIBS = \
+    -ldynamicMesh \
+    -lmeshTools \
+    -lnetcdf \
+    -L/home/tleasca/NERS570_F22_Project_TJSM/lib \
+    -L$(FOAM_USER_LIBBIN) \
+    -L$(OF_ROOT_PATH)/platforms/linux64IccDPInt32Opt/lib \
+    -L${LD_LIBRARY_PATH}
+
